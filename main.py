@@ -5,17 +5,16 @@ from deepface import DeepFace
 from deepface.extendedmodels import Age, Gender, Race, Emotion
 
 def face_recogn(img_path):
-    try:
-        result = DeepFace.find(img_path=img_path, db_path='face_check')
-        result = result.values.tolist()
 
-        check_file(result, img_path)
 
-    except Exception as _ex:
-        return _ex
+    result = DeepFace.find(img_path=img_path, db_path='face_check', enforce_detection=False, model_name='Facenet')
+    result = result.values.tolist()
+    return result, img_path
+
+
 
 def check_file(result, img_path):
-    if len(result) > 0:
+    if len(result):
         for i in result:
             file_name = i[0].split('/')[-1].split('.')[0]
             os.path.exists(f'{file_name}')
@@ -26,14 +25,7 @@ def check_file(result, img_path):
             print(f"Файл добавлен, путь{dest}")
             delete()
     else:
-
-        file_name = img_path.split('/')[-1].split('.')[0]
-        os.mkdir(f'{file_name}')
-        print(f'Папка создана {file_name}')
-        destination = f"{file_name}"
-        dest = shutil.move(img_path, destination)
-        print(f"Файл добавлен, путь{dest}")
-        delete()
+        analize(img_path)
 
 
 def analize(img_path):
@@ -45,15 +37,23 @@ def analize(img_path):
     with open(f"{file_name}/{file_name}.txt", "w", encoding="utf-8")as file:
         for key, val in total.items():
             file.write('{}:{}\n'.format(key, val))
+    shutil.copy(img_path, "face_check")
+    os.path.exists(f'{file_name}')
+    destination = f"{file_name}"
+    dest = shutil.move(img_path, destination)
+    print(f"Файл добавлен, путь{dest}")
+    delete()
 
 def delete():
-    if os.path.isfile(r'C:\Users\bt030\PycharmProjects\search_by_photo\face_check\representations_vgg_face.pkl'):
-        os.remove(r'C:\Users\bt030\PycharmProjects\search_by_photo\face_check\representations_vgg_face.pkl')
-        print("success")
-    else: print("File doesn't exists!")
+    for file in os.listdir("face_check"):
+        if ".pkl" in file:
+            os.remove(f"face_check/{file}")
+    print("success")
+
 
 
 if __name__ == '__main__':
-    # print(face_recogn(img_path='face_send/johnny-depp-8.jpg'))
-    analize(img_path='face_send/johnny-depp-8.jpg')
+    result, img_path = face_recogn(img_path='face_send/vin.jpg')
+    check_file(result, img_path=img_path)
+    delete()
 
