@@ -17,10 +17,10 @@ def check_file(result, img_path):
     if len(result):
         for i in result:
             file_name = i[0].split('/')[-1].split('.')[0]
-            os.path.exists(f'{file_name}')
+            os.path.exists(f'faces/{file_name}')
             print(file_name)
             print('Папка найдена')
-            destination = f"{file_name}"
+            destination = f"faces/{file_name}"
             dest = shutil.move(img_path, destination)
             print(f"Файл добавлен, путь{dest}")
             delete()
@@ -30,16 +30,16 @@ def check_file(result, img_path):
 
 def analize(img_path):
     file_name = img_path.split('/')[-1].split('.')[0]
-    os.mkdir(f'{file_name}')
+    os.mkdir(f'faces/{file_name}')
     print(f'Папка создана {file_name}')
     result_dict = DeepFace.analyze(img_path=img_path, actions=('age', 'gender'), enforce_detection=False)
     total = {"age": result_dict.get("age"), "gender": result_dict.get("gender")}
-    with open(f"{file_name}/{file_name}.txt", "w", encoding="utf-8")as file:
+    with open(f"faces/{file_name}/{file_name}.txt", "w", encoding="utf-8")as file:
         for key, val in total.items():
             file.write('{}:{}\n'.format(key, val))
     shutil.copy(img_path, "face_check")
-    os.path.exists(f'{file_name}')
-    destination = f"{file_name}"
+    os.path.exists(f'faces/{file_name}')
+    destination = f"faces/{file_name}"
     dest = shutil.move(img_path, destination)
     print(f"Файл добавлен, путь{dest}")
     delete()
@@ -53,7 +53,7 @@ def delete():
 
 
 if __name__ == '__main__':
-    result, img_path = face_recogn(img_path='face_send/vin.jpg')
+    result, img_path = face_recogn(img_path='face_send/harry.jpeg')
     check_file(result, img_path=img_path)
-    delete()
+
 
